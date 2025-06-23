@@ -1,15 +1,19 @@
 <template>
-  <div class="flex items-center border-t bg-white px-4 py-2">
-    <input
+  <div
+    class="flex w-9/12 items-center rounded-2xl border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-400"
+  >
+    <textarea
       v-model="inputText"
-      @keyup.enter="sendMessage"
-      type="text"
-      class="flex-1 rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+      @keyup.enter.exact.prevent="sendMessage"
+      rows="1"
       placeholder="请输入内容..."
-    />
+      class="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent max-h-24 flex-1 resize-none overflow-y-auto bg-transparent text-gray-900 placeholder-gray-400 outline-none"
+    ></textarea>
     <button
+      :disabled="!inputText.trim()"
       @click="sendMessage"
-      class="ml-2 rounded-lg bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600"
+      class="ml-3 rounded-full bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+      aria-label="发送消息"
     >
       发送
     </button>

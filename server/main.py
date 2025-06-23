@@ -24,7 +24,7 @@ async def read_root():
     return {"message": "Welcome to the Langgraph FastAPI application!"}
 
 
-@app.get("/chat")
+@app.post("/chat")
 async def chat(req: Request, response: Response):
 
     response.headers["Content-Type"] = "text/event-stream"

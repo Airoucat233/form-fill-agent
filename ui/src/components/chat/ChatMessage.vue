@@ -1,23 +1,19 @@
 <template>
-  <div class="flex" :class="{ 'justify-end': message.sender === 'user' }">
-    <div
-      class="max-w-xs rounded-lg px-4 py-2"
-      :class="{
-        'bg-blue-500 text-white': message.sender === 'user',
-        'bg-gray-200 text-gray-800': message.sender === 'ai',
-      }"
-    >
-      <span>{{ message.text }}</span>
+  <div class="flex w-full py-5">
+    <div v-if="message.role === 'Human'" class="flex w-full justify-end">
+      <div class="bg-primary/15 max-w-7/12 rounded-lg p-3">
+        {{ message.content }}
+      </div>
+    </div>
+    <div v-else class="flex w-full">
+      <MarkDown v-model="message.content"></MarkDown>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-interface Message {
-  text: string
-  sender: 'user' | 'ai'
-}
-
+import type { Message } from '@/types/chat'
+import MarkDown from '@/components/markdown/index.vue'
 defineProps<{
   message: Message
 }>()
