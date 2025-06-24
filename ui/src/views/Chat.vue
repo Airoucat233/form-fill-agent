@@ -207,7 +207,7 @@ C -->|描述| F[节点]
 ## 视频
 \`\`\`video
 {
-"url":"https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4"
+"url":"https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4"
 }
 \`\`\`
 ## iframe

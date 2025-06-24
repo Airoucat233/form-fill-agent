@@ -1,11 +1,11 @@
 <template>
-  <div class="flex w-full py-5">
+  <div class="chat-message flex w-8/12 py-5">
     <div v-if="message.role === 'Human'" class="flex w-full justify-end">
-      <div class="bg-primary/15 max-w-7/12 rounded-lg p-3">
+      <div class="bg-primary/15 rounded-lg p-3">
         {{ message.content }}
       </div>
     </div>
-    <div v-else class="flex w-full">
+    <div v-else class="flex w-0 flex-1">
       <MarkDown v-model="message.content"></MarkDown>
     </div>
   </div>

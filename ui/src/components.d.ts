@@ -15,6 +15,7 @@ declare module 'vue' {
     ChatInput: typeof import('./components/chat/ChatInput.vue')['default']
     ChatMessage: typeof import('./components/chat/ChatMessage.vue')['default']
     ChatMessages: typeof import('./components/chat/ChatMessages.vue')['default']
+    ECharts: typeof import('./components/markdown/components/ECharts.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./components/icons/IconDocumentation.vue')['default']

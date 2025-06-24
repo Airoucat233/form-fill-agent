@@ -1,11 +1,11 @@
 <template>
   <div
-    class="flex w-9/12 items-center rounded-2xl border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-400"
+    class="chat-input flex w-8/12 items-center rounded-2xl border border-gray-300 bg-white px-4 py-3 shadow-md focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-400"
   >
     <textarea
       v-model="inputText"
       @keyup.enter.exact.prevent="sendMessage"
-      rows="1"
+      rows="3"
       placeholder="请输入内容..."
       class="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent max-h-24 flex-1 resize-none overflow-y-auto bg-transparent text-gray-900 placeholder-gray-400 outline-none"
     ></textarea>

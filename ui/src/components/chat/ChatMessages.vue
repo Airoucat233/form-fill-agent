@@ -1,8 +1,6 @@
 <template>
-  <div class="flex flex-1 justify-center overflow-x-hidden overflow-y-auto">
-    <div class="flex w-8/12 flex-col items-center space-y-3 p-4">
-      <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
-    </div>
+  <div class="chat-messages flex w-full flex-col items-center overflow-y-auto">
+    <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
   </div>
 </template>
 
