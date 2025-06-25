@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import ChatContainer from '@/components/chat/ChatContainer.vue'
 import ChatHeader from '@/components/chat/ChatHeader.vue'
 import ChatMessages from '@/components/chat/ChatMessages.vue'
@@ -70,154 +70,8 @@ const messages = ref<Message[]>([
 
   {
     role: 'AI',
-    thinkingContent: '',
-    content1: `
-
-\`\`\`interactive
-{
-"type" : "form",
-"title" : "请假申请单",
-"fields":
-[
-		{
-			"dataType":"String",
-			"description":"请假类型",
-			"enumValues":[
-				"事假",
-				"年假"
-			],
-			"id":"type",
-			"inputType":"select",
-			"label":"请假类型",
-			"required":true,
-			"value":""
-		},
-		{
-			"dataType":"String",
-			"description":"开始时间",
-			"id":"startDate",
-			"inputType":"date",
-			"label":"开始时间",
-			"required":true,
-			"value":""
-		},
-		{
-			"dataType":"String",
-			"description":"结束时间",
-			"id":"endDate",
-			"inputType":"date",
-			"label":"结束时间",
-			"required":true,
-			"value":""
-		},
-		{
-			"dataType":"String",
-			"description":"请假原因",
-			"id":"reason",
-			"inputType":"textarea",
-			"label":"请假原因",
-			"required":true,
-			"value":""
-		}
-	]
-}
-\`\`\`
-        `,
-    content: `
-# Markdown 常用样式示例
-## 1. 标题
-# H1
-## H2
-### H3
-
-## 2. 文本样式
-**加粗文本**
-*斜体文本*
-~~删除线文本~~
-这是\`行内代码\`的示例
-长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本
-
-## 3. 列表
-### 无序列表
-- 项目1
-- 项目2
-- 子项目2.1
-- 子项目2.2
-
-### 有序列表
-1. 第一项
-2. 第二项
-1. 子项2.1
-2. 子项2.2
-
-## 4. 链接与图片
-[普通链接](https://example.com)
-![图片描述](https://example.com/image.jpg)
-
-## 5. 表格
-| 左对齐 | 居中对齐 | 右对齐 |
-| :------ | :------: | ------: |
-| 单元格 | 单元格 | 单元格 |
-| 数据1 | 数据2 | 数据3 |
-
-## 6. 代码块
-\`\`\`javascript
-// JavaScript 示例
-function hello() {
-console.log("Hello World!");
-}
-\`\`\`
-## 7. emoji
-\`:smile:\` -> :smile:
-## 8. 上标和下标
-\`E=mc^2^\` -> E=mc^2^
-
-\`H~2~O\` -> H~2~O
-## 8. ehcarts
-
-\`\`\`echarts
-{
-"title": {
-"text": "ECharts 示例图表"
-},
-"tooltip": {},
-"legend": {
-"data": ["销量"]
-},
-"xAxis": {
-"data": ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋"]
-},
-"yAxis": {},
-"series": [{
-"name": "销量",
-"type": "bar",
-"data": [5, 20, 36, 10, 10]
-}]
-}
-\`\`\`
-## 9. 流程图
-\`\`\`mermaid
-graph TD
-A[开始] --> B(节点)
-B --> C{分支节点}
-C -->|描述| D[节点]
-C -->|描述| E[节点]
-C -->|描述| F[节点]
-\`\`\`
-## 视频
-\`\`\`video
-{
-"url":"https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4"
-}
-\`\`\`
-## iframe
-\`\`\`iframe
-{
-"url":"https://www.qjyy.com"
-}
-\`\`\`
-
-        `,
+    // thinkingContent: '',
+    content: '',
     observation: [
       {
         type: 'references',
@@ -389,6 +243,119 @@ const handleSendMessage = (input: string) => {
     },
   })
 }
+import { useTypewriter } from '@/components/markdown/hooks/useTypewriter'
+const { startTyping } = useTypewriter()
+onMounted(() => {
+  current.aiMessage = messages.value[messages.value.length - 1] as AIMessage
+  let template = `
+# Markdown 常用样式示例
+## 1. 标题
+# H1
+## H2
+### H3
+
+## 2. 文本样式
+**加粗文本**
+*斜体文本*
+~~删除线文本~~
+这是\`行内代码\`的示例
+长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本
+
+## 3. 列表
+### 无序列表
+- 项目1
+- 项目2
+- 子项目2.1
+- 子项目2.2
+
+### 有序列表
+1. 第一项
+2. 第二项
+1. 子项2.1
+2. 子项2.2
+
+## 4. 链接与图片
+[普通链接](https://example.com)
+![图片描述](https://example.com/image.jpg)
+
+## 5. 表格
+| 左对齐 | 居中对齐 | 右对齐 |
+| :------ | :------: | ------: |
+| 单元格 | 单元格 | 单元格 |
+| 数据1 | 数据2 | 数据3 |
+
+## 6. 代码块
+\`\`\`javascript
+// JavaScript 示例
+function hello() {
+console.log("Hello World!");
+}
+\`\`\`
+## 7. emoji
+\`:smile:\` -> :smile:
+## 8. 上标和下标
+\`E=mc^2^\` -> E=mc^2^
+
+\`H~2~O\` -> H~2~O
+## 8. ehcarts
+
+\`\`\`echarts
+{
+"title": {
+"text": "ECharts 示例图表"
+},
+"tooltip": {},
+"legend": {
+"data": ["销量"]
+},
+"xAxis": {
+"data": ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋"]
+},
+"yAxis": {},
+"series": [{
+"name": "销量",
+"type": "bar",
+"data": [5, 20, 36, 10, 10]
+}]
+}
+\`\`\`
+## 9. 流程图
+\`\`\`mermaid
+graph TD
+A[开始] --> B(节点)
+B --> C{分支节点}
+C -->|描述| D[节点]
+C -->|描述| E[节点]
+C -->|描述| F[节点]
+\`\`\`
+## 视频
+\`\`\`video
+{
+"url":"https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4https://ai-assistant-obs.qjyy.com/Vedio/video1.mp4"
+}
+\`\`\`
+## iframe
+\`\`\`iframe
+{
+"url":"https://www.qjyy.com"
+}
+\`\`\``
+  template = `
+## 9. 流程图
+\`\`\`mermaid
+graph TD
+A[开始] --> B(节点)
+B --> C{分支节点}
+C -->|描述| D[节点]
+C -->|描述| E[节点]
+C -->|描述| F[节点]
+\`\`\``
+  startTyping(template, 100, [1, 10], (text) => {
+    if (current.aiMessage) {
+      current.aiMessage.content += text
+    }
+  })
+})
 </script>
 
 <style lang="scss" scoped>

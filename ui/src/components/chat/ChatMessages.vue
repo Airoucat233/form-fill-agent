@@ -1,12 +1,12 @@
 <template>
-  <div class="chat-messages flex w-full flex-col items-center overflow-y-auto">
+  <div class="chat-messages flex w-full flex-1 flex-col items-center overflow-y-auto">
     <ChatMessage v-for="(message, index) in messages" :key="index" :message="message" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
-import ChatMessage from '@/components/chat/ChatMessage.vue'
+import ChatMessage from './ChatMessage.vue'
 import type { Message } from '@/types/chat'
 
 const props = defineProps<{
