@@ -15,8 +15,8 @@ import { ref, computed, onMounted, type Component } from 'vue'
 
 import { full as emoji } from 'markdown-it-emoji'
 import { useVNodeRenderer } from './hooks/useVNodeRenderer'
-import preWrapperPlugin from './plugins/preWrapper'
-import lineNumbersPlugin from './plugins/lineNumbers'
+import preWrapperPlugin from '../../utils/markdown/preWrapper'
+import lineNumbersPlugin from '../../utils/markdown/lineNumbers'
 
 const props = defineProps<{
   modelValue: string

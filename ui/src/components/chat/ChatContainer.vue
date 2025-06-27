@@ -3,6 +3,7 @@
     <slot name="header"></slot>
     <slot name="messages"></slot>
     <slot name="input"></slot>
+    <slot></slot>
   </div>
 </template>
 

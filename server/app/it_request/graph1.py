@@ -21,20 +21,21 @@ from langchain_core.callbacks.manager import (
 from langchain_core.runnables import RunnableLambda, RunnableConfig
 
 from .utils.pretty import pretty_print_messages
-from .chat_model import qwen_max
+from .chat_model import qwen_max, qwen_plus
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from .prompts import (
     supervisor_instructions,
     form_fill_agent_instructions,
     supervisor_instructions1,
+    supervisor_instructions2,
 )
 
 load_dotenv("./app/.env")
 # 👇验证（可选）
 print("LangSmith project:", os.getenv("LANGSMITH_PROJECT"))
 
-model = qwen_max
+model = qwen_plus
 
 
 class InputType(str, Enum):
@@ -99,9 +100,10 @@ class TemplateState(AgentState):
 
 
 @tool("获取需求工单模版")
-def get_template(
+async def get_template(
     state: Annotated[TemplateState, InjectedState],
     tool_call_id: Annotated[str, InjectedToolCallId],
+    config: RunnableConfig,
 ) -> Command:
     """获取需求工单模版"""
     template = {
@@ -117,7 +119,14 @@ def get_template(
             "desc": {"type": "String", "desc": "需求详细描述", "required": True},
         },
     }
-
+    await adispatch_custom_event(
+        "tool_result",
+        {
+            "type": "form",
+            "data": template,
+        },
+        config=config,
+    )
     return Command(
         update={
             **state,
@@ -160,11 +169,6 @@ def create_request(form_data: dict) -> dict:
     return {"code": 0, "message": "success", "data": "创建成功,工单ID:123"}
 
 
-def post_template_hook(state: TemplateState):
-    print(1)
-    # 将template中的结构化输出写回state中
-
-
 template_agent = create_react_agent(
     model=model,
     tools=[get_template],
@@ -176,7 +180,7 @@ template_agent = create_react_agent(
         输出要求：
             - 不可编造模板,必须是通过工具获取的
     """,
-    post_model_hook=post_template_hook,
+    # post_model_hook=post_template_hook,
     state_schema=TemplateState,
     # response_format=Template,
 )
@@ -275,7 +279,7 @@ supervisor_agent = create_react_agent(
         assign_to_end,
     ],
     # pre_model_hook=summarization_node,
-    prompt=supervisor_instructions1,
+    prompt=supervisor_instructions2,
     state_schema=OverallState,
     name="supervisor",
 )

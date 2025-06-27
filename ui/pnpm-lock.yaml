@@ -62,6 +62,9 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.17(typescript@5.8.3)
+      vue-markdown-stream-test:
+        specifier: ^0.5.8
+        version: 0.5.8(vue@3.5.17(typescript@5.8.3))
       vue-router:
         specifier: ^4.5.0
         version: 4.5.1(vue@3.5.17(typescript@5.8.3))
@@ -2325,6 +2328,11 @@ packages:
       '@vue/composition-api':
         optional: true
 
+  vue-markdown-stream-test@0.5.8:
+    resolution: {integrity: sha512-RqMfXxa39bkJ8qSP60/+vrSzbl5vVl/e6RK5Dvx77MJ9NRtDicRkZZjztJyAk2ZCn76RG1yAPNpcZ9I09pkprw==}
+    peerDependencies:
+      vue: ^3.0.0
+
   vue-router@4.5.1:
     resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
@@ -4440,6 +4448,14 @@ snapshots:
 
   vue-demi@0.14.10(vue@3.5.17(typescript@5.8.3)):
     dependencies:
+      vue: 3.5.17(typescript@5.8.3)
+
+  vue-markdown-stream-test@0.5.8(vue@3.5.17(typescript@5.8.3)):
+    dependencies:
+      github-markdown-css: 5.8.1
+      highlight.js: 11.11.1
+      markdown-it: 14.1.0
+      markdown-it-emoji: 3.0.0
       vue: 3.5.17(typescript@5.8.3)
 
   vue-router@4.5.1(vue@3.5.17(typescript@5.8.3)):

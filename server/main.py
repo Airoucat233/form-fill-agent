@@ -1,8 +1,13 @@
 import json
+import uuid
 from fastapi import FastAPI, Request, Response
 from sse_starlette import EventSourceResponse
-from server.api.endpoints import langgraph
-from app.it_request.graph1 import assistant
+from api.endpoints import langgraph
+from langgraph.types import interrupt, Command
+from langgraph.checkpoint.memory import InMemorySaver
+
+# from app.it_request.graph1 import assistant
+from app.it_request.graph0 import assistant
 import uvicorn
 
 app = FastAPI()
@@ -18,6 +23,8 @@ test_message = {
     ],
 }
 
+role_map = {"Human": "user", "AI": "assistant"}
+
 
 @app.get("/")
 async def read_root():
@@ -29,54 +36,102 @@ async def chat(req: Request, response: Response):
 
     response.headers["Content-Type"] = "text/event-stream"
     response.headers["Cache-Control"] = "no-cache"
-    initial_state = {
-        "messages": [
-            {
-                "role": "user",
-                "content": "我需要申请一个开发环境的账号,OA系统的管理员账号",
-            }
-        ],
-        "template": {},  # 初始化模板
-        "form_data": {},  # 初始化表单数据
-        "missing_form_data": {},  # 初始化缺失的表单数据
-        "structured_response": {},  # 初始化标志
-    }
+    body = await req.json()
+    request = None
+    if body["resume"]:
+        request = Command(resume=body["resume"])
+    else:
+        request = {
+            "messages": list(
+                map(
+                    lambda m: {"role": role_map[m["role"]], "content": m["content"]},
+                    body["messages"],
+                )
+            ),
+            "template": {},  # 初始化模板
+            "form_fill_result": {
+                "form_data": {},
+                "missing_data": {},
+                "ask_further": None,
+            },
+            "user_accept": False,
+        }
+
+    # assistant.get_state({"configurable": {"thread_id": "123456"}})
 
     async def event_stream():
+        if not body["session_id"]:
+            session_id = uuid.uuid4()
+            config = {"configurable": {"thread_id": session_id}}
+            yield {"event": "session_id", "data": session_id}
+        else:
+            config = {"configurable": {"thread_id": body["session_id"]}}
         async for event in assistant.astream_events(
-            initial_state,
-            include_types=["chat_model", "tool", "visual"],
+            request,
+            config=config,
+            # include_types=["chat_model", "tool", "visual", "tool_result", "chain"],
         ):
-            print(event)
+            # print(event)
             print("===============")
             event_type = event["event"]
+
+            result = None
             if event_type == "on_chat_model_stream":
                 content = event["data"]["chunk"].content
                 if content:
-                    yield {"event": "message", "data": event["data"]["chunk"].content}
+                    result = {
+                        "event": "message",
+                        "data": event["data"]["chunk"].content,
+                    }
+                    yield result
             elif event_type == "on_tool_start":
                 if not event["name"].startswith("transfer_to"):
-                    yield {
+                    result = {
                         "event": "tool_start",
-                        "data": {"name": event["name"]},
+                        "data": json.dumps({"name": event["name"]}, ensure_ascii=False),
                     }
+                    yield result
             elif event_type == "on_tool_end":
                 if not event["name"].startswith("transfer_to"):
-                    yield {
+                    result = {
                         "event": "tool_end",
-                        "data": {
-                            "name": event["name"],
-                            "input": event["data"]["input"],
-                            "output": event["data"]["output"],
-                        },
+                        "data": json.dumps(
+                            {
+                                "name": event["name"],
+                                # "output": event["data"]["output"],
+                            },
+                            ensure_ascii=False,
+                        ),
                     }
+                    yield result
             elif event_type == "on_custom_event":
-                yield {
+                result = {
                     "event": event["name"],
-                    "data": event["data"],
+                    "data": json.dumps(event["data"], ensure_ascii=False),
                 }
-
-            # yield {"data": event["data"], "event": event["event"]}
+                yield result
+            elif event_type == "on_chain_stream":
+                interrupts = event.get("data", {}).get("chunk", {}).get("__interrupt__")
+                if interrupts:
+                    yield {
+                        "event": "interrupt",
+                        "data": json.dumps(
+                            list(
+                                map(
+                                    lambda interrupt: {
+                                        "interrupt_id": interrupt.interrupt_id,
+                                        "value": interrupt.value,
+                                    },
+                                    interrupts,
+                                )
+                            ),
+                            ensure_ascii=False,
+                        ),
+                    }
+            else:
+                result = event
+            print(result)
+            # yield (result)
 
     return EventSourceResponse(event_stream())
 
@@ -112,4 +167,4 @@ async def chat(request: Request, response: Response):
 
 
 if __name__ == "__main__":
-    uvicorn.run("server.main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

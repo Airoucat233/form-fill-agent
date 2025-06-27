@@ -42,6 +42,7 @@
         <template #input>
           <ChatInput @send-message="handleSendMessage" />
         </template>
+        <div @click="changeAccept">111->{{ current.interrupt }}</div>
       </ChatContainer>
     </div>
   </div>
@@ -170,9 +171,18 @@ const messages = ref<Message[]>([
 
 const current = reactive<{
   aiMessage: AIMessage | null
+  interrupt: any
+  sessionId: string
 }>({
   aiMessage: null,
+  interrupt: null,
+  sessionId: '',
 })
+
+const changeAccept = () => {
+  current.interrupt[0].value.user_accept = true
+  console.log(111)
+}
 
 const ctrl = ref()
 
@@ -208,12 +218,19 @@ const handleCreateNewChat = () => {
 const handleSendMessage = (input: string) => {
   ctrl.value?.abort()
   ctrl.value = new AbortController()
+  let resume = null
+  if (current.interrupt) {
+    resume = { ...current.interrupt[0].value }
+    // current.interrupt = null
+  }
   messages.value.push({ content: input, role: 'Human' })
 
   streamFetch('/chat', {
     method: 'POST',
     body: JSON.stringify({
-      prompt: input,
+      messages: messages.value,
+      session_id: current.sessionId,
+      resume,
     }),
     signal: ctrl.value.signal,
     async onopen(res) {
@@ -222,18 +239,31 @@ const handleSendMessage = (input: string) => {
       messages.value.push(current.aiMessage)
     },
     async onmessage(ev) {
-      if (ev.event == 'message') {
-        if (current.aiMessage) {
-          current.aiMessage.content += ev.data
-        } else {
-          console.warn('aiMessage not initialized before streaming')
-        }
+      if (!ev.event) return
+      if (!current.aiMessage) {
+        console.warn('aiMessage not initialized before streaming')
+        return
       }
-      try {
-        const res: string = JSON.parse(ev.data)
-        console.log(res)
-      } catch (err) {
-        throw err
+      if (current.interrupt) {
+        current.interrupt = null
+      }
+      if (ev.event == 'session_id') {
+        current.sessionId = ev.data
+      } else if (ev.event == 'message') {
+        current.aiMessage.content += ev.data
+      } else if (['tool_start', 'tool_end'].includes(ev.event)) {
+        const res: { name: string } = JSON.parse(ev.data)
+        current.aiMessage.content += `\n${ev.event}:${res.name}\n`
+      } else {
+        try {
+          const res: any = JSON.parse(ev.data)
+          current.aiMessage.content += `\n${ev.event}:\n\`\`\`json\n${ev.data}\n\`\`\`\n`
+          if (ev.event == 'interrupt') {
+            current.interrupt = res
+          }
+        } catch (err) {
+          console.error('解析json失败:' + ev)
+        }
       }
     },
     onclose() {},
@@ -246,7 +276,8 @@ const handleSendMessage = (input: string) => {
 import { useTypewriter } from '@/components/markdown/hooks/useTypewriter'
 const { startTyping } = useTypewriter()
 onMounted(() => {
-  current.aiMessage = messages.value[messages.value.length - 1] as AIMessage
+  messages.value = []
+  // current.aiMessage = messages.value[messages.value.length - 1] as AIMessage
   let template = `
 # Markdown 常用样式示例
 ## 1. 标题
@@ -259,7 +290,7 @@ onMounted(() => {
 *斜体文本*
 ~~删除线文本~~
 这是\`行内代码\`的示例
-长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本
+长文本长文本长文本长文本长文本长文本长文本长文本长文本长文本
 
 ## 3. 列表
 ### 无序列表
@@ -340,21 +371,21 @@ C -->|描述| F[节点]
 "url":"https://www.qjyy.com"
 }
 \`\`\``
-  template = `
-## 9. 流程图
-\`\`\`mermaid
-graph TD
-A[开始] --> B(节点)
-B --> C{分支节点}
-C -->|描述| D[节点]
-C -->|描述| E[节点]
-C -->|描述| F[节点]
-\`\`\``
-  startTyping(template, 100, [1, 10], (text) => {
-    if (current.aiMessage) {
-      current.aiMessage.content += text
-    }
-  })
+  //   template = `
+  // ## 9. 流程图
+  // \`\`\`mermaid
+  // graph TD
+  // A[开始] --> B(节点)
+  // B --> C{分支节点}
+  // C -->|描述| D[节点]
+  // C -->|描述| E[节点]
+  // C -->|描述| F[节点]
+  // \`\`\``
+  // startTyping(template, 100, [1, 10], (text) => {
+  //   if (current.aiMessage) {
+  //     current.aiMessage.content += text
+  //   }
+  // })
 })
 </script>
 

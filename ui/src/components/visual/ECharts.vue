@@ -47,8 +47,6 @@ const renderCharts = () => {
   if (option.value) {
     loading.value = false
     chart?.setOption(option.value)
-
-    setTimeout(() => {}, 0)
   }
 }
 

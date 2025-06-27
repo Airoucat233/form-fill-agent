@@ -15,9 +15,9 @@ qwen_turbo = ChatTongyi(
     api_key="sk-4ee07326926747998474add2f2f138c9",
 )
 
-qwen_plus_latest = ChatTongyi(
-    # streaming=True,
+qwen_plus = ChatTongyi(
+    streaming=True,
     temperature=0.1,
-    model_name="qwen-plus-latest",
+    model_name="qwen-plus",
     api_key="sk-4ee07326926747998474add2f2f138c9",
 )
